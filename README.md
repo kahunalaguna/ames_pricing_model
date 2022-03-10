@@ -1,0 +1,41 @@
+
+### Ames Housing Data and Pricing Model with Linear Regression
+### Kevin Gates
+
+
+
+### Project Overview
+
+For the second project in General Assembly's Data Science Immersive students were asked to analyze a dataset of house features and sale prices in order to build models utilizing linear regression to predict sales price for an unseen data set. The project doubled as a competition on kaggle.com where students were able to upload their model's price predictions for the test set and compete to see whose predictions yield the lowest root mean squared error. Project 2 built upon our foundation of data cleaning, exploratory data analysis and statistical analysis by providing us with the first real opportunity to test our ability to build predictive regression models and navigate an expansive data set with ~80 unique features of numeric and categorical data of discrete, ordinal, and continuous types.
+
+### Problem Statement 
+
+Real estate is the largest asset class in the world so it is no wonder that at any given moment someone, somewhere, is making the decision to buy or sell a residential property. Though Ames, Iowa is by no means a hot real estate market, homebuyers and homeowners are still faced with the same questions regarding properties there as with any other place. How much is a home worth? Can I afford it? What should I sell this house for? What features are most important when it commes to their influence on price? What house features should buyers and sellers alike focus on?
+As much as I sought to uncover answers to these questions in my analysis, they led my to questions of my own as a data scientist especially when it comes to modeling. When tasked with something like building a pricing regression model, should data scientists think like a homebuyer first and a dat scientist second when forced to make sense of an inundating number of features. If you were buying the home and not building a model what features would you focus on first? Can this approach aid the modeling workflow?
+
+### Dataset
+
+The dataset used in this project comes from the Ames, Iowa Assessor's Office and includes 2930 observations and 82 variables. This information was used when computing the assessed value of residential properties sold in Ames, Iowa between 2006 and 2010. A link to the data dictionary and more in depth information abbout the data can be found [here].(http://jse.amstat.org/v19n3/decock/DataDocumentation.txt)
+
+### Summary of Analysis
+
+To get at my problem statement I applied a made-up framework to each of the 80 features in the dataset to qualify them for inclusion in model building. I call this framework: 
+"How to think like a Homebuyer"
+- What does feature distribution look like?
+- What does feature relationship with prrice look like?
+- Would someone at an open house notice/care about this feature?
+To answer these questions I looked at feature histograms, scatterplots against price, correlation with price, and a pinch of subjective judgement. I used my qualification framework to rank each feature into an A, B, or C tier. "A" meaning immediately include in model, "B" meaning test to include later, and "C" meaning it doesn't seem like the feature is worth including. 
+I began with an A tier of 11 numerical variables and 6 categorical variables. To build my base model I used only A tier numeric features. Beginning with regular linear regression I progressed into building a pipe, scaling features, fitting polynomial features, and applying LassoCV. After constructing this pipe I tested every numeric feature in B and C list to verify that thinking like a homebuyer first could work. Only 4 additional numeric features improved model performance and I added these to the A tier list. This feature list, in conjunction with StandardScaler, PolynomialFeatures, and LassoCV brought me to my baseline model of R2 0.93, 0.92 and RMSE 22000, 23000. 
+From this baseline I iterated upon the model by implementing incrementally top tier categorical features with the use of OneHotEncoder. Ultimately deciding upon the inclusion of 6 categorical features, my model core feature count was 20 out of 80. Though these ohe'd features brought marginal improvements to rmse, the model also became increasingly overfit on the train data which speaks towards its poor ability to generalize to new and unseen data. This is seen particularly in kaggle prediction submission scores, where rmse for test data routinely score well above thosse for train splits. I settled upon a final model of R2 0.97, 0.93 and RMSE 14000, 22000. 
+
+### Conceptual Understanding
+Root mean squared error is a metric that descrribes the average distance from the predicted value to the actual values. Seeking models that minimize rmse is another way of trrying to fit a model that predicts values for sales price that are on average closest to actual sales price values.
+R2 scores describe the amount of variability in tarrget varriable y (sale price) that can be explained by the function of predictor variables which in this case are the 20 of 80 features categorical and numerical that I included in my final model.
+Lasso and Ridge regression are methods of regularization that can be introduced to a model to trry to regularize coefficients especially when models have numerous features and high complexity. Because lasso regression operates on the absolute value of coef's it tends to take some coef's all the way to zero while ridge only pulls coefs down toward zero. I believe this makes Lasso regreession better for my purposes because my models particularly with the inclusion of polynomial features  are very feature dense and Lasso does a better job at reigning in model complexity than ridge does in those situations. I assume therefore that should I spend more time model iterating with this data in the future I should make a point of introducing ridge regression instead of lasso regresesion when model instances include a lower number of features perhaps in models without polynomial features at all or where polynomial feature's  set_interactions is toggled to lesson the n^degree of features introduced to a model.
+Linear regression coefficients can be interpreted to mean when all else is held constant, a unit increase in feature X_ will result in a change in y of value=coef_.  Because Lasso and Ridge coefficients are essentially dampened or pulled to zero by constrarint, I believe we lose a great deal of interpretability in Lasso and Ridge regression models as far as coefficients arre concerned which is why I didn't explicitly evaluate them. I did use coef's to gauge the relative effectiveness of a feature's inclusion in a model and coupled with change in r2 and rmse metrics, coef's were part of my decision-making prrocess to include or exclude a feature from a model's next iteration.
+
+### Conclusions/Takeaways
+
+Going back to my problem statement, the stability of my numerical features rankings supported the argument of thinking like a homebuyer first and a data scientist second when building a house pricing model. Furthermore, the uniformity of the top features list created a narrative that there is a core group of features that encapsulatted much of the perceived variability in house price and those features are related to Year built and Year remodelled, # of rooms, # full bathrooms, kitchen qualitty, garage size and quality, basement size and quality, roof material, overall quality, and location (as expressed by neighborhood and zoning). 
+
+Given more time with this project it would be productive to clean nonsensical outliers from certain features that can be causing unpredictable model behavior. It would also be helpful to address collinearity between included features since this may be one of the culprits behind the model overfitting the train set and the high variance we see most clearly in our kaggle prediction scores. Our best kaggle prediction RMSE was just above 30000. Next steps could be to identify ways to improve the variance in residuals the model creates especially at the upper bounds of sale price. It would also be extremely interesting to introduce more time series data and economic metric features to see how national or state economic features factor into residential asset class performance. 
